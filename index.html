@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日記 — Nikki Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F4EF;
+    --dusty-blue:#BFD6E6;
+    --sage:#A9B7A3;
+    --sakura:#EFD5D8;
+    --warm-brown:#6E5846;
+    --navy:#2D3A4A;
+    --line: rgba(45,58,74,0.16);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:48px 20px;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(191,214,230,0.35), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(169,183,163,0.28), transparent 50%),
+      #EDE7DC;
+    font-family:'EB Garamond', serif;
+    color:var(--navy);
+  }
+
+  .page{
+    position:relative;
+    width:100%;
+    max-width:620px;
+    background:var(--cream);
+    border-radius:3px;
+    padding:52px 46px 40px;
+    box-shadow:
+      0 1px 2px rgba(45,58,74,0.06),
+      0 18px 45px rgba(45,58,74,0.14);
+    overflow:hidden;
+  }
+
+  /* paper grain */
+  .page::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:0.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.43  0 0 0 0 0.35  0 0 0 0 0.27  0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* washi tape */
+  .tape{
+    position:absolute;
+    height:34px;
+    opacity:0.82;
+    z-index:3;
+  }
+  .tape.tl{
+    top:-8px; left:36px; width:110px;
+    background:repeating-linear-gradient(45deg, #cfe1ec, #cfe1ec 6px, #dcebf3 6px, #dcebf3 12px);
+    transform:rotate(-7deg);
+    box-shadow:0 2px 3px rgba(45,58,74,0.08);
+  }
+  .tape.tr{
+    top:-6px; right:54px; width:88px;
+    background:repeating-linear-gradient(-45deg, #ecdbdd, #ecdbdd 6px, #f3e6e8 6px, #f3e6e8 12px);
+    transform:rotate(6deg);
+    box-shadow:0 2px 3px rgba(45,58,74,0.08);
+  }
+
+  /* sakura branch signature element */
+  .branch{
+    position:absolute;
+    top:8px;
+    right:-14px;
+    width:150px;
+    z-index:2;
+    opacity:0.95;
+  }
+  .petal{
+    position:absolute;
+    width:7px; height:7px;
+    background:var(--sakura);
+    border-radius:70% 30% 65% 35%;
+    opacity:0;
+    animation:fall 9s ease-in infinite;
+  }
+  .petal:nth-child(1){ left:40px; top:60px; animation-delay:0s; }
+  .petal:nth-child(2){ left:75px; top:40px; animation-delay:3.2s; }
+  .petal:nth-child(3){ left:20px; top:90px; animation-delay:6.1s; }
+  @keyframes fall{
+    0%{ opacity:0; transform:translate(0,0) rotate(0deg); }
+    8%{ opacity:0.85; }
+    85%{ opacity:0.6; }
+    100%{ opacity:0; transform:translate(-26px, 170px) rotate(140deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .petal{ animation:none; opacity:0; }
+  }
+
+  header{
+    position:relative;
+    z-index:4;
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .kanji-title{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:40px;
+    letter-spacing:0.08em;
+    color:var(--navy);
+    margin:0;
+  }
+  .sub-title{
+    font-family:'Quicksand', sans-serif;
+    font-size:12.5px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--warm-brown);
+    margin:4px 0 0;
+  }
+
+  .nav-tabs{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:16px;
+  }
+  .nav-tab{
+    font-family:'Quicksand', sans-serif;
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    padding:7px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--warm-brown);
+    cursor:pointer;
+    transition:all .16s ease;
+  }
+  .nav-tab.active{
+    background:var(--navy);
+    border-color:var(--navy);
+    color:var(--cream);
+  }
+
+  .archive-hint{
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    text-align:center;
+    color:var(--warm-brown);
+    margin:0 0 14px;
+  }
+  .archive-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:340px;
+    overflow-y:auto;
+    padding-right:4px;
+  }
+  .archive-empty{
+    text-align:center;
+    font-family:'Quicksand', sans-serif;
+    font-size:13px;
+    color:rgba(45,58,74,0.5);
+    padding:20px 0;
+  }
+  .archive-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    cursor:pointer;
+    font-family:'Quicksand', sans-serif;
+    transition:all .14s ease;
+  }
+  .archive-item:hover{ border-color:var(--dusty-blue); background:#fbfdfe; }
+  .archive-item .a-date{ font-size:13px; color:var(--navy); }
+  .archive-item .a-mood{ font-size:12px; color:var(--warm-brown); }
+  .archive-item .a-del{
+    font-size:11px;
+    color:rgba(45,58,74,0.4);
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:2px 6px;
+  }
+  .archive-item .a-del:hover{ color:#b5555a; }
+
+  .save-status{
+    text-align:center;
+    font-family:'Quicksand', sans-serif;
+    font-size:11px;
+    color:var(--sage);
+    margin:18px 0 0;
+    min-height:14px;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .save-status.show{ opacity:1; }
+
+  .divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:22px 0;
+    color:var(--sage);
+    font-size:13px;
+    user-select:none;
+  }
+  .divider::before, .divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    font-family:'Quicksand', sans-serif;
+    font-size:13px;
+    color:var(--warm-brown);
+  }
+  .meta-row label{
+    display:block;
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--sage);
+    margin-bottom:5px;
+  }
+  .date-field{
+    font-family:'EB Garamond', serif;
+    font-size:17px;
+    font-style:italic;
+    color:var(--navy);
+    background:transparent;
+    border:none;
+    border-bottom:1px dashed var(--line);
+    padding:2px 0;
+    width:170px;
+  }
+
+  .weather-row{ display:flex; gap:10px; }
+  .weather-btn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:15px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .18s ease;
+  }
+  .weather-btn.active{
+    background:var(--dusty-blue);
+    border-color:var(--dusty-blue);
+    transform:scale(1.08);
+  }
+
+  .mood-block{ margin-top:22px; }
+  .mood-options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 20px;
+    margin-top:8px;
+  }
+  .mood-opt{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'Quicksand', sans-serif;
+    font-size:13.5px;
+    color:var(--navy);
+    cursor:pointer;
+    user-select:none;
+  }
+  .mood-circle{
+    width:15px; height:15px;
+    border-radius:50%;
+    border:1.4px solid var(--warm-brown);
+    display:inline-block;
+    position:relative;
+    transition:all .15s ease;
+  }
+  .mood-opt.selected .mood-circle{
+    background:var(--sakura);
+    border-color:var(--sakura);
+  }
+  .mood-opt.selected .mood-circle::after{
+    content:"🌸";
+    position:absolute; left:-2px; top:-11px;
+    font-size:11px;
+  }
+
+  section.entry{ margin-top:8px; }
+  .entry h3{
+    font-family:'Shippori Mincho', serif;
+    font-size:15.5px;
+    font-weight:500;
+    color:var(--warm-brown);
+    margin:0 0 8px;
+    letter-spacing:0.03em;
+  }
+  .lined{
+    min-height:64px;
+    font-size:16px;
+    line-height:28px;
+    background-image:repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--line) 27px, var(--line) 28px);
+    outline:none;
+    padding-top:2px;
+    color:var(--navy);
+  }
+  .lined:empty::before{
+    content:attr(data-placeholder);
+    color:rgba(45,58,74,0.35);
+    font-style:italic;
+  }
+  .lined.small{ min-height:32px; }
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+  }
+
+  .quote-box{
+    text-align:center;
+    padding:16px 10px;
+    margin-top:4px;
+  }
+  .quote-box .label{
+    font-family:'Shippori Mincho', serif;
+    font-size:14px;
+    color:var(--warm-brown);
+    margin-bottom:8px;
+  }
+  .quote-text{
+    font-style:italic;
+    font-size:16px;
+    outline:none;
+    color:var(--navy);
+  }
+
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:8px;
+  }
+  .chip{
+    font-family:'Quicksand', sans-serif;
+    font-size:12.5px;
+    padding:6px 13px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    color:var(--navy);
+    transition:all .16s ease;
+  }
+  .chip.on{
+    background:var(--sage);
+    border-color:var(--sage);
+    color:#fff;
+  }
+
+  .habit-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px 18px;
+    margin-top:10px;
+  }
+  .habit{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Quicksand', sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .habit .box{
+    width:16px; height:16px;
+    border:1.4px solid var(--warm-brown);
+    border-radius:3px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+    color:var(--sage);
+  }
+  .habit.done .box{ background:var(--dusty-blue); border-color:var(--dusty-blue); color:var(--navy); }
+
+  .bottom-row{
+    display:grid;
+    grid-template-columns:1fr 132px;
+    gap:26px;
+    margin-top:10px;
+    align-items:start;
+  }
+  .photo-square{
+    width:132px; height:132px;
+    border:1.5px dashed var(--warm-brown);
+    border-radius:4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:6px;
+    cursor:pointer;
+    color:var(--warm-brown);
+    font-family:'Quicksand', sans-serif;
+    font-size:11px;
+    text-align:center;
+    overflow:hidden;
+    position:relative;
+    background:#fff;
+  }
+  .photo-square img{
+    width:100%; height:100%; object-fit:cover;
+  }
+
+  footer{
+    margin-top:30px;
+    text-align:center;
+  }
+  .leaf-line{
+    color:var(--sage);
+    font-size:14px;
+    letter-spacing:0.3em;
+  }
+
+  .print-btn{
+    display:block;
+    margin:26px auto 0;
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    background:var(--navy);
+    color:var(--cream);
+    border:none;
+    padding:10px 22px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .print-btn:hover{ opacity:0.88; }
+
+  @media print{
+    body{ padding:0; background:#fff; }
+    .page{ box-shadow:none; max-width:100%; }
+    .print-btn{ display:none; }
+  }
+
+  @media (max-width:480px){
+    .page{ padding:44px 22px 30px; }
+    .two-col{ grid-template-columns:1fr; gap:0; }
+    .bottom-row{ grid-template-columns:1fr; }
+    .photo-square{ width:100%; }
+    .habit-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page" id="page">
+  <div class="tape tl"></div>
+  <div class="tape tr"></div>
+
+  <svg class="branch" viewBox="0 0 150 130" fill="none">
+    <path d="M148 4 C120 18, 95 30, 70 48 C50 62, 35 72, 15 78" stroke="#6E5846" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M95 32 C92 24, 90 18, 92 10" stroke="#6E5846" stroke-width="1.2"/>
+    <g fill="#EFD5D8">
+      <circle cx="92" cy="9" r="6"/>
+      <circle cx="70" cy="48" r="7"/>
+      <circle cx="46" cy="60" r="6"/>
+      <circle cx="30" cy="70" r="5.5"/>
+      <circle cx="15" cy="78" r="5"/>
+    </g>
+    <g fill="#BFD6E6" opacity="0.8">
+      <circle cx="80" cy="40" r="2.5"/>
+      <circle cx="55" cy="56" r="2.5"/>
+      <circle cx="22" cy="74" r="2"/>
+    </g>
+  </svg>
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+
+  <header>
+    <p class="kanji-title">🌸 日記</p>
+    <p class="sub-title">my quiet record — nikki</p>
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tabToday">Today</button>
+      <button class="nav-tab" id="tabArchive">📖 Past Entries</button>
+    </div>
+  </header>
+
+  <div id="archivePanel" style="display:none;">
+    <div class="divider">❀ ❀ ❀</div>
+    <p class="archive-hint">Tap a date to open that entry. Editing it updates the saved version.</p>
+    <div id="archiveList" class="archive-list"></div>
+    <div class="divider">❀ ❀ ❀</div>
+  </div>
+
+  <div id="entryPanel">
+
+  <div class="divider">❀ ❀ ❀</div>
+
+  <div class="meta-row">
+    <div>
+      <label>date</label>
+      <input class="date-field" id="dateField" type="text" value="">
+    </div>
+    <div>
+      <label>weather</label>
+      <div class="weather-row" id="weatherRow">
+        <button class="weather-btn" data-w="☀">☀</button>
+        <button class="weather-btn" data-w="☁">☁</button>
+        <button class="weather-btn" data-w="🌧">🌧</button>
+        <button class="weather-btn" data-w="🌙">🌙</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mood-block">
+    <label style="font-family:'Quicksand',sans-serif;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage);">mood</label>
+    <div class="mood-options" id="moodOptions">
+      <span class="mood-opt" data-m="Happy"><span class="mood-circle"></span>Happy</span>
+      <span class="mood-opt" data-m="Calm"><span class="mood-circle"></span>Calm</span>
+      <span class="mood-opt" data-m="Excited"><span class="mood-circle"></span>Excited</span>
+      <span class="mood-opt" data-m="Tired"><span class="mood-circle"></span>Tired</span>
+      <span class="mood-opt" data-m="Sad"><span class="mood-circle"></span>Sad</span>
+    </div>
+  </div>
+
+  <div class="divider">────────────</div>
+
+  <section class="entry">
+    <h3>Today...</h3>
+    <div class="lined" id="todayField" contenteditable="true" data-placeholder="What happened today?"></div>
+  </section>
+
+  <div class="divider">🍃</div>
+
+  <section class="entry">
+    <h3>Thoughts</h3>
+    <div class="lined" id="thoughtsField" contenteditable="true" data-placeholder="Whatever crossed your mind..."></div>
+  </section>
+
+  <div class="divider">🍃</div>
+
+  <section class="entry">
+    <h3>Gratitude</h3>
+    <div class="lined small" id="gratitudeField" contenteditable="true" data-placeholder="One small thing you're thankful for"></div>
+  </section>
+
+  <div class="divider">❀ ❀ ❀</div>
+
+  <div class="two-col">
+    <section class="entry">
+      <h3>🎵 Today's Song</h3>
+      <div class="lined small" id="songField" contenteditable="true" data-placeholder="Track on repeat"></div>
+    </section>
+    <section class="entry">
+      <h3>Tomorrow</h3>
+      <div class="lined small" id="tomorrowField" contenteditable="true" data-placeholder="One thing to look forward to"></div>
+    </section>
+  </div>
+
+  <div class="quote-box">
+    <div class="label">今日の言葉 — today's words</div>
+    <div class="quote-text" contenteditable="true" id="quoteText">"Even the moon changes every night."</div>
+  </div>
+
+  <div class="divider">❀ ❀ ❀</div>
+
+  <section class="entry">
+    <h3>🍵 Today's Drink</h3>
+    <div class="chip-row" id="drinkRow">
+      <span class="chip">Matcha</span>
+      <span class="chip">Coffee</span>
+      <span class="chip">Milk Tea</span>
+      <span class="chip">Juice</span>
+    </div>
+  </section>
+
+  <section class="entry" style="margin-top:22px;">
+    <h3>Small Habits</h3>
+    <div class="habit-grid" id="habitGrid">
+      <span class="habit"><span class="box">✓</span>Water</span>
+      <span class="habit"><span class="box">✓</span>Exercise</span>
+      <span class="habit"><span class="box">✓</span>Study</span>
+      <span class="habit"><span class="box">✓</span>Japanese</span>
+      <span class="habit"><span class="box">✓</span>Reading</span>
+      <span class="habit"><span class="box">✓</span>Sleep well</span>
+    </div>
+  </section>
+
+  <div class="bottom-row">
+    <div></div>
+    <div class="photo-square" id="photoSquare">
+      <span style="font-size:20px;">📷</span>
+      <span>memory of<br>the day</span>
+      <input type="file" accept="image/*" id="photoInput" style="display:none;">
+    </div>
+  </div>
+
+  <footer>
+    <div class="leaf-line">🌸 🍃 🌸</div>
+  </footer>
+
+  </div><!-- /entryPanel -->
+</div>
+
+<p class="save-status" id="saveStatus">&nbsp;</p>
+<button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+<script>
+  const STORAGE_PREFIX = 'nikki-journal:';
+  let currentKey = null; // ISO date string of entry currently open, e.g. 2026-07-16
+
+  function isoFromDate(d){
+    return d.toISOString().slice(0,10);
+  }
+
+  function todayKey(){
+    return isoFromDate(new Date());
+  }
+
+  function displayDate(iso){
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  }
+
+  function safeGet(key){
+    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+    catch(e){ return null; }
+  }
+  function safeSet(key, obj){
+    try{ localStorage.setItem(key, JSON.stringify(obj)); return true; }
+    catch(e){ return false; }
+  }
+  function safeRemove(key){
+    try{ localStorage.removeItem(key); }catch(e){}
+  }
+
+  // ---------- gather / apply form state ----------
+  function gatherEntry(){
+    return {
+      dateKey: currentKey,
+      dateDisplay: dateField.value,
+      weather: document.querySelector('.weather-btn.active')?.dataset.w || '',
+      mood: document.querySelector('.mood-opt.selected')?.dataset.m || '',
+      today: byId('todayField').innerHTML,
+      thoughts: byId('thoughtsField').innerHTML,
+      gratitude: byId('gratitudeField').innerHTML,
+      song: byId('songField').innerHTML,
+      tomorrow: byId('tomorrowField').innerHTML,
+      quote: byId('quoteText').innerHTML,
+      drink: document.querySelector('#drinkRow .chip.on')?.textContent || '',
+      habits: Array.from(document.querySelectorAll('.habit')).map(h => h.classList.contains('done'))
+    };
+  }
+
+  function byId(id){ return document.getElementById(id); }
+
+  function applyEntry(entry){
+    dateField.value = entry.dateDisplay || displayDate(entry.dateKey);
+
+    document.querySelectorAll('.weather-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.w === entry.weather);
+    });
+    document.querySelectorAll('.mood-opt').forEach(o=>{
+      o.classList.toggle('selected', o.dataset.m === entry.mood);
+    });
+    byId('todayField').innerHTML = entry.today || '';
+    byId('thoughtsField').innerHTML = entry.thoughts || '';
+    byId('gratitudeField').innerHTML = entry.gratitude || '';
+    byId('songField').innerHTML = entry.song || '';
+    byId('tomorrowField').innerHTML = entry.tomorrow || '';
+    byId('quoteText').innerHTML = entry.quote || '"Even the moon changes every night."';
+
+    document.querySelectorAll('#drinkRow .chip').forEach(c=>{
+      c.classList.toggle('on', c.textContent === entry.drink);
+    });
+    document.querySelectorAll('.habit').forEach((h,i)=>{
+      h.classList.toggle('done', !!(entry.habits && entry.habits[i]));
+    });
+  }
+
+  function blankEntry(key){
+    return {
+      dateKey:key, dateDisplay:displayDate(key), weather:'', mood:'',
+      today:'', thoughts:'', gratitude:'', song:'', tomorrow:'',
+      quote:'"Even the moon changes every night."', drink:'', habits:[false,false,false,false,false,false]
+    };
+  }
+
+  function openEntry(key){
+    currentKey = key;
+    const saved = safeGet(STORAGE_PREFIX + key);
+    applyEntry(saved || blankEntry(key));
+    showTodayPanel();
+  }
+
+  let saveTimer = null;
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      const ok = safeSet(STORAGE_PREFIX + currentKey, gatherEntry());
+      flashStatus(ok ? 'Saved ✓' : 'Could not save — storage unavailable here');
+      if(document.getElementById('archivePanel').style.display !== 'none') renderArchive();
+    }, 500);
+  }
+
+  const statusEl = document.getElementById('saveStatus');
+  function flashStatus(msg){
+    statusEl.textContent = msg;
+    statusEl.classList.add('show');
+    clearTimeout(flashStatus._t);
+    flashStatus._t = setTimeout(()=> statusEl.classList.remove('show'), 1600);
+  }
+
+  // ---------- date field ----------
+  const dateField = document.getElementById('dateField');
+
+  // ---------- weather ----------
+  document.querySelectorAll('.weather-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.weather-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      scheduleSave();
+    });
+  });
+
+  // ---------- mood ----------
+  document.querySelectorAll('.mood-opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      scheduleSave();
+    });
+  });
+
+  // ---------- drink ----------
+  document.querySelectorAll('#drinkRow .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#drinkRow .chip').forEach(c=>c.classList.remove('on'));
+      chip.classList.add('on');
+      scheduleSave();
+    });
+  });
+
+  // ---------- habits ----------
+  document.querySelectorAll('.habit').forEach(h=>{
+    h.addEventListener('click', ()=>{ h.classList.toggle('done'); scheduleSave(); });
+  });
+
+  // ---------- text fields ----------
+  ['todayField','thoughtsField','gratitudeField','songField','tomorrowField','quoteText'].forEach(id=>{
+    byId(id).addEventListener('input', scheduleSave);
+  });
+
+  // ---------- photo (session only, not persisted) ----------
+  const photoSquare = document.getElementById('photoSquare');
+  const photoInput = document.getElementById('photoInput');
+  photoSquare.addEventListener('click', ()=> photoInput.click());
+  photoInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      photoSquare.innerHTML = `<img src="${ev.target.result}" alt="memory">`;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ---------- tabs ----------
+  const tabToday = document.getElementById('tabToday');
+  const tabArchive = document.getElementById('tabArchive');
+  const entryPanel = document.getElementById('entryPanel');
+  const archivePanel = document.getElementById('archivePanel');
+
+  function showTodayPanel(){
+    entryPanel.style.display = '';
+    archivePanel.style.display = 'none';
+    tabToday.classList.add('active');
+    tabArchive.classList.remove('active');
+  }
+  function showArchivePanel(){
+    entryPanel.style.display = 'none';
+    archivePanel.style.display = '';
+    tabToday.classList.remove('active');
+    tabArchive.classList.add('active');
+    renderArchive();
+  }
+  tabToday.addEventListener('click', ()=> openEntry(todayKey()));
+  tabArchive.addEventListener('click', showArchivePanel);
+
+  function allSavedKeys(){
+    const keys = [];
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith(STORAGE_PREFIX)) keys.push(k.slice(STORAGE_PREFIX.length));
+      }
+    }catch(e){}
+    return keys.sort().reverse();
+  }
+
+  function renderArchive(){
+    const list = document.getElementById('archiveList');
+    const keys = allSavedKeys();
+    if(keys.length === 0){
+      list.innerHTML = '<div class="archive-empty">No past entries yet — write today\'s and it\'ll show up here tomorrow.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    keys.forEach(k=>{
+      const entry = safeGet(STORAGE_PREFIX + k) || {};
+      const row = document.createElement('div');
+      row.className = 'archive-item';
+      row.innerHTML = `<span class="a-date">${entry.dateDisplay || displayDate(k)}</span>
+                        <span class="a-mood">${entry.mood ? '🌸 '+entry.mood : ''}</span>
+                        <button class="a-del" title="Delete entry">✕</button>`;
+      row.querySelector('.a-del').addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        if(confirm('Delete this entry? This cannot be undone.')){
+          safeRemove(STORAGE_PREFIX + k);
+          renderArchive();
+        }
+      });
+      row.addEventListener('click', ()=> openEntry(k));
+      list.appendChild(row);
+    });
+  }
+
+  // ---------- init ----------
+  openEntry(todayKey());
+</script>
+
+</body>
+</html>
