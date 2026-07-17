@@ -130,6 +130,91 @@
     margin:4px 0 0;
   }
 
+  .rangoli{
+    position:absolute;
+    bottom:6px;
+    left:-6px;
+    width:88px;
+    z-index:2;
+    opacity:0.9;
+  }
+
+  .greeting{
+    text-align:center;
+    font-family:'Quicksand', sans-serif;
+    font-size:13px;
+    color:var(--warm-brown);
+    letter-spacing:0.04em;
+    margin:0 0 4px;
+  }
+
+  .add-habit-row{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .add-habit-row input{
+    flex:1;
+    font-family:'Quicksand', sans-serif;
+    font-size:12.5px;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    outline:none;
+    background:#fff;
+    color:var(--navy);
+  }
+  .add-habit-row input:focus{ border-color:var(--dusty-blue); }
+  .add-habit-row button{
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    padding:8px 16px;
+    border-radius:999px;
+    border:1px solid var(--sage);
+    background:var(--sage);
+    color:#fff;
+    cursor:pointer;
+  }
+  .habit .box.custom-del{
+    margin-left:4px;
+    border:none;
+    color:rgba(45,58,74,0.35);
+    font-size:11px;
+    cursor:pointer;
+    background:none;
+  }
+
+  .auth-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    color:var(--warm-brown);
+    flex-wrap:wrap;
+  }
+  .auth-btn{
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    padding:8px 18px;
+    border-radius:999px;
+    border:1px solid var(--navy);
+    background:#fff;
+    color:var(--navy);
+    cursor:pointer;
+  }
+  .auth-btn:hover{ background:var(--navy); color:var(--cream); }
+  .auth-status{ display:flex; align-items:center; gap:8px; }
+  .auth-status img{ width:22px; height:22px; border-radius:50%; }
+  .signout-link{
+    color:var(--warm-brown);
+    text-decoration:underline;
+    cursor:pointer;
+    font-size:11.5px;
+  }
+
   .nav-tabs{
     display:flex;
     justify-content:center;
@@ -409,35 +494,6 @@
   }
   .habit.done .box{ background:var(--dusty-blue); border-color:var(--dusty-blue); color:var(--navy); }
 
-  .bottom-row{
-    display:grid;
-    grid-template-columns:1fr 132px;
-    gap:26px;
-    margin-top:10px;
-    align-items:start;
-  }
-  .photo-square{
-    width:132px; height:132px;
-    border:1.5px dashed var(--warm-brown);
-    border-radius:4px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    gap:6px;
-    cursor:pointer;
-    color:var(--warm-brown);
-    font-family:'Quicksand', sans-serif;
-    font-size:11px;
-    text-align:center;
-    overflow:hidden;
-    position:relative;
-    background:#fff;
-  }
-  .photo-square img{
-    width:100%; height:100%; object-fit:cover;
-  }
-
   footer{
     margin-top:30px;
     text-align:center;
@@ -473,8 +529,6 @@
   @media (max-width:480px){
     .page{ padding:44px 22px 30px; }
     .two-col{ grid-template-columns:1fr; gap:0; }
-    .bottom-row{ grid-template-columns:1fr; }
-    .photo-square{ width:100%; }
     .habit-grid{ grid-template-columns:repeat(2,1fr); }
   }
 </style>
@@ -505,6 +559,29 @@
   <div class="petal"></div>
   <div class="petal"></div>
 
+  <svg class="rangoli" viewBox="0 0 120 120" fill="none">
+    <g opacity="0.85">
+      <circle cx="60" cy="60" r="4" fill="#C9793B"/>
+      <g fill="#C9793B">
+        <circle cx="60" cy="34" r="3.2"/>
+        <circle cx="60" cy="86" r="3.2"/>
+        <circle cx="34" cy="60" r="3.2"/>
+        <circle cx="86" cy="60" r="3.2"/>
+        <circle cx="42" cy="42" r="2.6"/>
+        <circle cx="78" cy="42" r="2.6"/>
+        <circle cx="42" cy="78" r="2.6"/>
+        <circle cx="78" cy="78" r="2.6"/>
+      </g>
+      <g fill="#8A2E36" opacity="0.75">
+        <circle cx="60" cy="18" r="2.2"/>
+        <circle cx="60" cy="102" r="2.2"/>
+        <circle cx="18" cy="60" r="2.2"/>
+        <circle cx="102" cy="60" r="2.2"/>
+      </g>
+      <circle cx="60" cy="60" r="26" stroke="#C9793B" stroke-width="0.8" stroke-dasharray="2 4" fill="none"/>
+    </g>
+  </svg>
+
   <header>
     <p class="kanji-title">🌸 日記</p>
     <p class="sub-title">my quiet record — nikki</p>
@@ -512,6 +589,7 @@
       <button class="nav-tab active" id="tabToday">Today</button>
       <button class="nav-tab" id="tabArchive">📖 Past Entries</button>
     </div>
+    <div class="auth-row" id="authRow"></div>
   </header>
 
   <div id="archivePanel" style="display:none;">
@@ -522,6 +600,8 @@
   </div>
 
   <div id="entryPanel">
+
+  <p class="greeting" id="greetingLine">&nbsp;</p>
 
   <div class="divider">❀ ❀ ❀</div>
 
@@ -536,6 +616,7 @@
         <button class="weather-btn" data-w="☀">☀</button>
         <button class="weather-btn" data-w="☁">☁</button>
         <button class="weather-btn" data-w="🌧">🌧</button>
+        <button class="weather-btn" data-w="🌦">🌦</button>
         <button class="weather-btn" data-w="🌙">🌙</button>
       </div>
     </div>
@@ -596,8 +677,8 @@
   <section class="entry">
     <h3>🍵 Today's Drink</h3>
     <div class="chip-row" id="drinkRow">
-      <span class="chip">Matcha</span>
-      <span class="chip">Coffee</span>
+      <span class="chip">Black Coffee</span>
+      <span class="chip">Chai</span>
       <span class="chip">Milk Tea</span>
       <span class="chip">Juice</span>
     </div>
@@ -605,27 +686,22 @@
 
   <section class="entry" style="margin-top:22px;">
     <h3>Small Habits</h3>
-    <div class="habit-grid" id="habitGrid">
-      <span class="habit"><span class="box">✓</span>Water</span>
-      <span class="habit"><span class="box">✓</span>Exercise</span>
-      <span class="habit"><span class="box">✓</span>Study</span>
-      <span class="habit"><span class="box">✓</span>Japanese</span>
-      <span class="habit"><span class="box">✓</span>Reading</span>
-      <span class="habit"><span class="box">✓</span>Sleep well</span>
+    <div class="habit-grid" id="habitGrid"></div>
+    <div class="add-habit-row">
+      <input type="text" id="newHabitInput" placeholder="Add your own habit..." maxlength="24">
+      <button id="addHabitBtn">+ Add</button>
     </div>
   </section>
 
-  <div class="bottom-row">
-    <div></div>
-    <div class="photo-square" id="photoSquare">
-      <span style="font-size:20px;">📷</span>
-      <span>memory of<br>the day</span>
-      <input type="file" accept="image/*" id="photoInput" style="display:none;">
-    </div>
-  </div>
+  <div class="divider">🎐</div>
+
+  <section class="entry">
+    <h3>🎐 Today's Season / Festival</h3>
+    <div class="lined small" id="seasonField" contenteditable="true" data-placeholder="A festival, a monsoon evening, cherry blossoms — anything in season"></div>
+  </section>
 
   <footer>
-    <div class="leaf-line">🌸 🍃 🌸</div>
+    <div class="leaf-line">🌸 🪔 🌸</div>
   </footer>
 
   </div><!-- /entryPanel -->
@@ -634,36 +710,136 @@
 <p class="save-status" id="saveStatus">&nbsp;</p>
 <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
 
+<!-- Firebase (for optional Google sign-in + cross-device sync). Safe to load even if not configured yet. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
   const STORAGE_PREFIX = 'nikki-journal:';
-  let currentKey = null; // ISO date string of entry currently open, e.g. 2026-07-16
+  const HABITS_KEY = STORAGE_PREFIX + 'habitList';
+  let currentKey = null;
+  let currentUser = null;
+  let firebaseReady = false;
+  let db = null, auth = null;
 
-  function isoFromDate(d){
-    return d.toISOString().slice(0,10);
-  }
+  // ---------------- Firebase setup (optional) ----------------
+  // Fill these in from your Firebase project settings to enable Google sign-in + cross-device sync.
+  // Until you do, the journal works fully offline using this browser's local storage.
+  const firebaseConfig = {
+    apiKey: "AIzaSyBlgIaLMG3mO65pSQ7r_vZeTDptjmyKFOg",
+    authDomain: "my-journal-1fa3b.firebaseapp.com",
+    projectId: "my-journal-1fa3b",
+    storageBucket: "my-journal-1fa3b.firebasestorage.app",
+    messagingSenderId: "651595596705",
+    appId: "1:651595596705:web:57b214abb306eb447701e0"
+  };
 
-  function todayKey(){
-    return isoFromDate(new Date());
-  }
+  try{
+    if(firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY" && typeof firebase !== 'undefined'){
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      firebaseReady = true;
+    }
+  }catch(e){ firebaseReady = false; }
 
+  function isoFromDate(d){ return d.toISOString().slice(0,10); }
+  function todayKey(){ return isoFromDate(new Date()); }
   function displayDate(iso){
     const d = new Date(iso + 'T00:00:00');
     return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
   }
 
-  function safeGet(key){
-    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
-    catch(e){ return null; }
+  function safeGetLocal(key){
+    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }catch(e){ return null; }
   }
-  function safeSet(key, obj){
-    try{ localStorage.setItem(key, JSON.stringify(obj)); return true; }
-    catch(e){ return false; }
+  function safeSetLocal(key, obj){
+    try{ localStorage.setItem(key, JSON.stringify(obj)); return true; }catch(e){ return false; }
   }
-  function safeRemove(key){
-    try{ localStorage.removeItem(key); }catch(e){}
+  function safeRemoveLocal(key){ try{ localStorage.removeItem(key); }catch(e){} }
+
+  // ---------------- greeting (bilingual, time-aware) ----------------
+  function updateGreeting(){
+    const h = new Date().getHours();
+    let line;
+    if(h < 12) line = 'おはよう · Good morning · सुप्रभात';
+    else if(h < 17) line = 'こんにちは · Good afternoon · नमस्ते';
+    else line = 'こんばんは · Good evening · शुभ संध्या';
+    document.getElementById('greetingLine').textContent = line;
   }
 
-  // ---------- gather / apply form state ----------
+  // ---------------- habit list (global, shared across days) ----------------
+  const DEFAULT_HABITS = ['Water', 'Exercise', 'Yoga / Meditation', 'Reading', 'Sleep well'];
+
+  function getHabitList(){
+    const local = safeGetLocal(HABITS_KEY);
+    return local && local.length ? local : DEFAULT_HABITS.slice();
+  }
+  function setHabitList(list){
+    safeSetLocal(HABITS_KEY, list);
+    if(firebaseReady && currentUser){
+      db.collection('users').doc(currentUser.uid).collection('meta').doc('habits')
+        .set({ list }).catch(()=>{});
+    }
+  }
+
+  function renderHabits(doneMap){
+    const grid = document.getElementById('habitGrid');
+    const list = getHabitList();
+    grid.innerHTML = '';
+    list.forEach(name=>{
+      const span = document.createElement('span');
+      span.className = 'habit' + (doneMap && doneMap[name] ? ' done' : '');
+      span.dataset.name = name;
+      span.innerHTML = `<span class="box">✓</span><span class="habit-name">${name}</span><button class="custom-del" title="Remove habit">✕</button>`;
+      span.querySelector('.habit-name, .box').addEventListener?.('click', ()=>{});
+      span.addEventListener('click', (e)=>{
+        if(e.target.classList.contains('custom-del')) return;
+        span.classList.toggle('done');
+        scheduleSave();
+      });
+      span.querySelector('.custom-del').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const newList = getHabitList().filter(h=>h!==name);
+        setHabitList(newList);
+        const doneNow = gatherHabitsDone();
+        renderHabits(doneNow);
+        scheduleSave();
+      });
+      grid.appendChild(span);
+    });
+  }
+
+  function gatherHabitsDone(){
+    const map = {};
+    document.querySelectorAll('#habitGrid .habit').forEach(h=>{
+      map[h.dataset.name] = h.classList.contains('done');
+    });
+    return map;
+  }
+
+  document.getElementById('addHabitBtn').addEventListener('click', addHabitFromInput);
+  document.getElementById('newHabitInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addHabitFromInput(); }
+  });
+  function addHabitFromInput(){
+    const input = document.getElementById('newHabitInput');
+    const name = input.value.trim();
+    if(!name) return;
+    const list = getHabitList();
+    if(list.includes(name)){ input.value=''; return; }
+    list.push(name);
+    setHabitList(list);
+    const doneNow = gatherHabitsDone();
+    renderHabits(doneNow);
+    input.value = '';
+    scheduleSave();
+  }
+
+  // ---------------- gather / apply entry ----------------
+  function byId(id){ return document.getElementById(id); }
+
   function gatherEntry(){
     return {
       dateKey: currentKey,
@@ -676,16 +852,14 @@
       song: byId('songField').innerHTML,
       tomorrow: byId('tomorrowField').innerHTML,
       quote: byId('quoteText').innerHTML,
+      season: byId('seasonField').innerHTML,
       drink: document.querySelector('#drinkRow .chip.on')?.textContent || '',
-      habits: Array.from(document.querySelectorAll('.habit')).map(h => h.classList.contains('done'))
+      habitsDone: gatherHabitsDone()
     };
   }
 
-  function byId(id){ return document.getElementById(id); }
-
   function applyEntry(entry){
     dateField.value = entry.dateDisplay || displayDate(entry.dateKey);
-
     document.querySelectorAll('.weather-btn').forEach(b=>{
       b.classList.toggle('active', b.dataset.w === entry.weather);
     });
@@ -698,26 +872,69 @@
     byId('songField').innerHTML = entry.song || '';
     byId('tomorrowField').innerHTML = entry.tomorrow || '';
     byId('quoteText').innerHTML = entry.quote || '"Even the moon changes every night."';
-
+    byId('seasonField').innerHTML = entry.season || '';
     document.querySelectorAll('#drinkRow .chip').forEach(c=>{
       c.classList.toggle('on', c.textContent === entry.drink);
     });
-    document.querySelectorAll('.habit').forEach((h,i)=>{
-      h.classList.toggle('done', !!(entry.habits && entry.habits[i]));
-    });
+    renderHabits(entry.habitsDone || {});
   }
 
   function blankEntry(key){
     return {
       dateKey:key, dateDisplay:displayDate(key), weather:'', mood:'',
-      today:'', thoughts:'', gratitude:'', song:'', tomorrow:'',
-      quote:'"Even the moon changes every night."', drink:'', habits:[false,false,false,false,false,false]
+      today:'', thoughts:'', gratitude:'', song:'', tomorrow:'', season:'',
+      quote:'"Even the moon changes every night."', drink:'', habitsDone:{}
     };
   }
 
-  function openEntry(key){
+  // ---------------- storage layer (local + optional cloud) ----------------
+  async function getEntry(key){
+    if(firebaseReady && currentUser){
+      try{
+        const doc = await db.collection('users').doc(currentUser.uid).collection('entries').doc(key).get();
+        if(doc.exists) return doc.data();
+      }catch(e){}
+    }
+    return safeGetLocal(STORAGE_PREFIX + key);
+  }
+
+  async function setEntry(key, data){
+    const ok = safeSetLocal(STORAGE_PREFIX + key, data);
+    if(firebaseReady && currentUser){
+      try{
+        await db.collection('users').doc(currentUser.uid).collection('entries').doc(key).set(data);
+      }catch(e){ flashStatus('Saved locally — cloud sync failed'); return ok; }
+    }
+    return ok;
+  }
+
+  async function deleteEntry(key){
+    safeRemoveLocal(STORAGE_PREFIX + key);
+    if(firebaseReady && currentUser){
+      try{ await db.collection('users').doc(currentUser.uid).collection('entries').doc(key).delete(); }catch(e){}
+    }
+  }
+
+  async function listKeys(){
+    if(firebaseReady && currentUser){
+      try{
+        const snap = await db.collection('users').doc(currentUser.uid).collection('entries').get();
+        return snap.docs.map(d=>d.id).sort().reverse();
+      }catch(e){}
+    }
+    const keys = [];
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith(STORAGE_PREFIX) && k !== HABITS_KEY) keys.push(k.slice(STORAGE_PREFIX.length));
+      }
+    }catch(e){}
+    return keys.sort().reverse();
+  }
+
+  async function openEntry(key){
     currentKey = key;
-    const saved = safeGet(STORAGE_PREFIX + key);
+    const saved = await getEntry(key);
     applyEntry(saved || blankEntry(key));
     showTodayPanel();
   }
@@ -725,8 +942,8 @@
   let saveTimer = null;
   function scheduleSave(){
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(()=>{
-      const ok = safeSet(STORAGE_PREFIX + currentKey, gatherEntry());
+    saveTimer = setTimeout(async ()=>{
+      const ok = await setEntry(currentKey, gatherEntry());
       flashStatus(ok ? 'Saved ✓' : 'Could not save — storage unavailable here');
       if(document.getElementById('archivePanel').style.display !== 'none') renderArchive();
     }, 500);
@@ -740,10 +957,9 @@
     flashStatus._t = setTimeout(()=> statusEl.classList.remove('show'), 1600);
   }
 
-  // ---------- date field ----------
+  // ---------------- date/weather/mood/drink ----------------
   const dateField = document.getElementById('dateField');
 
-  // ---------- weather ----------
   document.querySelectorAll('.weather-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.weather-btn').forEach(b=>b.classList.remove('active'));
@@ -752,7 +968,6 @@
     });
   });
 
-  // ---------- mood ----------
   document.querySelectorAll('.mood-opt').forEach(opt=>{
     opt.addEventListener('click', ()=>{
       document.querySelectorAll('.mood-opt').forEach(o=>o.classList.remove('selected'));
@@ -761,7 +976,6 @@
     });
   });
 
-  // ---------- drink ----------
   document.querySelectorAll('#drinkRow .chip').forEach(chip=>{
     chip.addEventListener('click', ()=>{
       document.querySelectorAll('#drinkRow .chip').forEach(c=>c.classList.remove('on'));
@@ -770,31 +984,11 @@
     });
   });
 
-  // ---------- habits ----------
-  document.querySelectorAll('.habit').forEach(h=>{
-    h.addEventListener('click', ()=>{ h.classList.toggle('done'); scheduleSave(); });
-  });
-
-  // ---------- text fields ----------
-  ['todayField','thoughtsField','gratitudeField','songField','tomorrowField','quoteText'].forEach(id=>{
+  ['todayField','thoughtsField','gratitudeField','songField','tomorrowField','quoteText','seasonField'].forEach(id=>{
     byId(id).addEventListener('input', scheduleSave);
   });
 
-  // ---------- photo (session only, not persisted) ----------
-  const photoSquare = document.getElementById('photoSquare');
-  const photoInput = document.getElementById('photoInput');
-  photoSquare.addEventListener('click', ()=> photoInput.click());
-  photoInput.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev)=>{
-      photoSquare.innerHTML = `<img src="${ev.target.result}" alt="memory">`;
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // ---------- tabs ----------
+  // ---------------- tabs ----------------
   const tabToday = document.getElementById('tabToday');
   const tabArchive = document.getElementById('tabArchive');
   const entryPanel = document.getElementById('entryPanel');
@@ -816,45 +1010,97 @@
   tabToday.addEventListener('click', ()=> openEntry(todayKey()));
   tabArchive.addEventListener('click', showArchivePanel);
 
-  function allSavedKeys(){
-    const keys = [];
-    try{
-      for(let i=0;i<localStorage.length;i++){
-        const k = localStorage.key(i);
-        if(k && k.startsWith(STORAGE_PREFIX)) keys.push(k.slice(STORAGE_PREFIX.length));
-      }
-    }catch(e){}
-    return keys.sort().reverse();
-  }
-
-  function renderArchive(){
+  async function renderArchive(){
     const list = document.getElementById('archiveList');
-    const keys = allSavedKeys();
+    list.innerHTML = '<div class="archive-empty">Loading...</div>';
+    const keys = await listKeys();
     if(keys.length === 0){
       list.innerHTML = '<div class="archive-empty">No past entries yet — write today\'s and it\'ll show up here tomorrow.</div>';
       return;
     }
     list.innerHTML = '';
-    keys.forEach(k=>{
-      const entry = safeGet(STORAGE_PREFIX + k) || {};
+    for(const k of keys){
+      const entry = await getEntry(k) || {};
       const row = document.createElement('div');
       row.className = 'archive-item';
       row.innerHTML = `<span class="a-date">${entry.dateDisplay || displayDate(k)}</span>
                         <span class="a-mood">${entry.mood ? '🌸 '+entry.mood : ''}</span>
                         <button class="a-del" title="Delete entry">✕</button>`;
-      row.querySelector('.a-del').addEventListener('click', (ev)=>{
+      row.querySelector('.a-del').addEventListener('click', async (ev)=>{
         ev.stopPropagation();
         if(confirm('Delete this entry? This cannot be undone.')){
-          safeRemove(STORAGE_PREFIX + k);
+          await deleteEntry(k);
           renderArchive();
         }
       });
       row.addEventListener('click', ()=> openEntry(k));
       list.appendChild(row);
-    });
+    }
   }
 
-  // ---------- init ----------
+  // ---------------- Google sign-in / sync ----------------
+  const authRow = document.getElementById('authRow');
+
+  function renderAuthUI(){
+    if(!firebaseReady){
+      authRow.innerHTML = `<span style="opacity:0.7;">Cloud sync not set up yet — journal is saved on this device only.</span>`;
+      return;
+    }
+    if(currentUser){
+      authRow.innerHTML = `
+        <span class="auth-status">
+          <img src="${currentUser.photoURL || ''}" alt="">
+          <span>${currentUser.email}</span>
+        </span>
+        <span class="signout-link" id="signOutLink">Sign out</span>`;
+      document.getElementById('signOutLink').addEventListener('click', ()=> auth.signOut());
+    } else {
+      authRow.innerHTML = `<button class="auth-btn" id="signInBtn">Sign in with Google to sync across devices</button>`;
+      document.getElementById('signInBtn').addEventListener('click', ()=>{
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err=> flashStatus('Sign-in failed'));
+      });
+    }
+  }
+
+  async function mergeLocalIntoCloudOnFirstLogin(){
+    // If the user has local entries but nothing in the cloud yet, push them up once.
+    try{
+      const cloudSnap = await db.collection('users').doc(currentUser.uid).collection('entries').limit(1).get();
+      if(!cloudSnap.empty) return; // cloud already has data, don't overwrite
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith(STORAGE_PREFIX) && k !== HABITS_KEY){
+          const dateKey = k.slice(STORAGE_PREFIX.length);
+          const data = safeGetLocal(k);
+          if(data) await db.collection('users').doc(currentUser.uid).collection('entries').doc(dateKey).set(data);
+        }
+      }
+      const localHabits = safeGetLocal(HABITS_KEY);
+      if(localHabits) await db.collection('users').doc(currentUser.uid).collection('meta').doc('habits').set({ list: localHabits });
+    }catch(e){}
+  }
+
+  if(firebaseReady){
+    auth.onAuthStateChanged(async (user)=>{
+      currentUser = user;
+      renderAuthUI();
+      if(user){
+        await mergeLocalIntoCloudOnFirstLogin();
+        // pull cloud habit list down if present
+        try{
+          const doc = await db.collection('users').doc(currentUser.uid).collection('meta').doc('habits').get();
+          if(doc.exists && doc.data().list) safeSetLocal(HABITS_KEY, doc.data().list);
+        }catch(e){}
+      }
+      openEntry(currentKey || todayKey());
+    });
+  } else {
+    renderAuthUI();
+  }
+
+  // ---------------- init ----------------
+  updateGreeting();
   openEntry(todayKey());
 </script>
 
